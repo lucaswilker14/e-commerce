@@ -5,19 +5,22 @@ const userController = new UserController();
 // get routes
 router.get('/', auth.required, userController.index);
 router.get('/:id', auth.required, userController.getUserById);
-router.get('/recuperar-senha', userController.showRecovery);
-router.get('/senha-recuperada', userController.showFinishRecovery)
 
 // post routes
 router.post('/login', userController.login());
 router.post('registrar', userController.registerUser);
-router.post('/recuperar-senha', userController.createRecovery);
-router.post('/senha-recuperada', userController.finishRecovery);
 
 // put routes
 router.put('/', auth.required, userController.update)
 
 // delete routes
-router.delete('/', auth.required, userController.deleteAccount);
+router.delete('/', auth.required, userController.removeUser);
+
+// password recovery
+router.get('/recuperar-senha', userController.showRecovery);
+router.get('/senha-recuperada', userController.showFinishRecovery)
+router.post('/recuperar-senha', userController.createRecovery);
+router.post('/senha-recuperada', userController.finishRecovery);
+
 
 module.exports = router;
