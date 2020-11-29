@@ -1,0 +1,4 @@
+{
+  "dbDev": "mongodb://localhost:27017/ecommerce-api-dev",
+  "dbProd": "mongodb://localhost:27017/ecommerce-api-prod"
+}
