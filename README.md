@@ -1,2 +1,2 @@
-# e-commerce
-E-commerce do zero
+# E-commerce
+E-commerce do zero com reactjs, nodejs, mongodb, express
