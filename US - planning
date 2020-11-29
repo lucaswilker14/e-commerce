@@ -1,0 +1,29 @@
+Use cases - E-commerce
+
+Roles:
+    - Admin:
+        - must have access to all orders placed within the store
+        - must be able to change the order status and notify customers of this change by email
+        - must put the tracking-code
+        - CRUD:
+            - orders (notify by email)
+            - clients (notify by email)
+            - products (notify by email)
+            - product variation
+            - categories
+        - must have access all products, clients, orders
+    - client:
+        - leave reviews
+        - close order
+        - choose payment
+        - make payment directly through the store (credit cart or billet)
+        - see all datas
+        - see order details
+        - cancelling orders
+        - change your data
+    - visitor:
+        - must see all categories, products, details, search for products
+        - change the order of products - alphabetical, price, random
+        - calculate shipping
+        - see cart
+        - register in system
