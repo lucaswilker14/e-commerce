@@ -17,14 +17,15 @@ const PORT = process.env.PORT || 3000;
 
 
 //  static files
-app.use("/api/public", express.static(__dirname + "/api/public"));
-app.use("/api/public/images", express.static(__dirname + "/api/public/images"));
+app.use("/api/public", express.static(__dirname + "../ecommerce/api/public"));
+app.use("/api/public/images", express.static(__dirname + "../ecommerce/api/public/images"));
 
 
 // db setup
 const db = require("../e-commerce/api/config/database.json");
 const dbURI = isProd ? db.dbProd : db.dbDev;
-mongoose.connect(dbURI, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+mongoose.connect(dbURI, {useNewUrlParser: true, useCreateIndex: true,
+                                useUnifiedTopology: true, useFindAndModify: false});
 
 
 // setup ejs
