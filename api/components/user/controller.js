@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const userModel = mongoose.model('User');
-const sendRecoveryEmail = require('../../helpers/email-recovery');
+const sendEmailRecovery = require('../../helpers/email-recovery');
+const recovery = '../api/components/user/views/recovery.ejs'
+
 
 class UserController {
 
@@ -66,7 +68,8 @@ class UserController {
 
     removeUserAccount(req, res, next) {
         const id = req.payload._id;
-        userModel.findByIdAndRemove(id).then(() => {
+        userModel.findByIdAndRemove(id).then(user => {
+            if(!user) return res.status(404).json({error: "Usuário não cadastrado"})
             res.json({message: 'Sua conta foi excluida!'});
         }).catch(next);
     };
@@ -76,7 +79,7 @@ class UserController {
      * Return view to recovery
      */
     showRecovery(req, res, next) {
-        return res.render('recovery', {error: null, success: null});
+        return res.render(recovery, {error: null, success: null});
     };
 
 
@@ -85,16 +88,15 @@ class UserController {
      */
     createRecovery(req, res, next) {
         const { email } = req.body;
-        if(!email) return res.render("recovery", {errros: "Preencha com seu email", success: null})
+        if(!email) return res.render(recovery, {error: "Preencha com seu email", success: null})
 
         userModel.findOne({ email }).then((user) => {
-            if(!user) return res.render("recovery", {errros: "Usuário não cadastrado", success: null})
-            const recoveryData = userModel.recoveryPassword();
+            if(!user) return res.render(recovery, {error: "Usuário não cadastrado", success: null})
+            const recoveryData = user.recoveryPassword();
             return user.save().then(() => {
-                return res.render('recovery', {error: null, success: true});
-                // sendRecoveryEmail({user, recovery: recoveryData}, (error = null, success = null) => {
-                //     return res.render("recovery", {error, success});
-                // });
+                sendEmailRecovery({user, recovery: recoveryData}, (error = null, success = null) => {
+                    return res.render(recovery, {error, success});
+                });
             }).catch(next)
         }).catch(next)
     };
@@ -119,16 +121,17 @@ class UserController {
         if(!token || !password) return res.render('recovery/store', {   error: "Preencha novamente com sua nova senha",
                                                                         success: null});
         userModel.findOne({ "recovery.token": token }).then((user) => {
-            if(!user) return res.render("recovery", {error: "Usuário não identificado", success: null});
-            userModel.resetToken();
-            userModel.encryptPassword(password);
-            return userModel.save().then(() => {
+            if(!user) return res.render(recovery, {error: "Usuário não identificado", success: null});
+            user.resetToken();
+            user.encryptPassword(password);
+            return user.save().then(() => {
                 return res.render("recovery/store", {   error: null,
                                                         success: "Senha alterada com Sucesso",
                                                         token: null });
             }).catch(next);
         }).catch(next);
     }
+
 }
 
 module.exports = UserController;
