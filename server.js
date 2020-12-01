@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
 
-// start
+// start application
 const app = express();
 
 

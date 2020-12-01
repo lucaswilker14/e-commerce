@@ -9,14 +9,14 @@ const userSchema = new schema({
 
     name: {
         type: String,
-        required: [true, "name is required"]
+        required: [true, "is required"]
     },
 
     email: {
         type: String,
         lowercase: true,
         unique: true,
-        required: [true, "email is required"],
+        required: [true, "is required"],
         index: true,
         match: [/\S+@\S+\.\S+/, 'email is invalid']
     },
@@ -24,7 +24,7 @@ const userSchema = new schema({
     store: {
         type: schema.Types.ObjectID,
         ref: 'store',
-        required: [true, 'store is required']
+        required: [true, 'is required']
     },
 
     role: {
@@ -54,8 +54,8 @@ userSchema.methods.encryptPassword = function(password) {
 };
 
 userSchema.methods.validatePassword = function(password) {
-    this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, "sha512").toString();
-    return password === this.hash;
+    const hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, "sha512").toString();
+    return hash === this.hash;
 }
 
 userSchema.methods.generateUserToken = function() {
@@ -80,7 +80,7 @@ userSchema.methods.getUserDecrypt = function() {
         role: this.role,
         token: this.generateUserToken()
     }
-}
+};
 
 userSchema.recoveryPassword = function() {
     this.recovery = {};

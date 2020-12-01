@@ -5,23 +5,20 @@ const sendRecoveryEmail = require('../../helpers/email-recovery');
 class UserController {
 
     /**
-     * return user data logged into the store
+     * return users datas logged into the store
      */
     index(req, res, next) {
-        userModel.findById(req.payload.id).then(user => {
+        userModel.findById(req.payload._id).then(user => {
             if(!user) return res.status(401).json({error: "Usuário não cadastrado!"});
-            return res.json({usuario: user.getUserDecrypt()})
+            return res.json({user: user.getUserDecrypt()})
         }).catch(next);
     };
 
 
-    /**
-     * return user by ID
-     */
     getUserById(req, res, next) {
         userModel.findById(req.params.id).then(user => {
             if(!user) return res.status(401).json({error: "Usuário não cadastrado!"});
-            return res.json({ usuario: {nome:   user.name,
+            return res.json({ user: {nome:   user.name,
                                         email:  user.email,
                                         role:   user.role,
                                         loja:   user.store}});
@@ -29,9 +26,6 @@ class UserController {
     }
 
 
-    /**
-     * Login in store
-     */
     login(req, res, next) {
         const { email, password } = req.body;
         if(!email) return res.status(422).json({errors: {email: "Email não pode ficar vazio"}});
@@ -39,31 +33,22 @@ class UserController {
         userModel.findOne({email}).then((user) => {
             if(!user) return res.status(422).json({errors: {email: "Usuário não está cadastrado"}});
             if(!user.validatePassword(password)) return res.status(422).json({errors: {email: "Senha Inválida"}});
-            return res.json({usuario: user.getUserDecrypt()});
+            return res.json({user: user.getUserDecrypt()});
         }).catch(next)
     };
 
 
-    /**
-     * register new user in store
-     */
     registerUser(req, res, next) {
         const { name, email, password, store } = req.body;
-
         if(!name || !email || !password || !store) return res.status(422).json({errors: "Preencha os campos de cadastro!"})
-
         const new_user = new userModel({ name, email, store });
         new_user.encryptPassword(password)
         new_user.save()
-            .then(() => res.json({usuario: new_user.getUserDecrypt()}))
+            .then(() => res.json({user: new_user.getUserDecrypt()}))
             .catch(next)
     };
 
 
-    /**
-     * PUT in root '/'
-     *  update user in the store
-     */
     update(req, res, next) {
         const { name, email, password } = req.body;
         userModel.findById(req.payload._id).then(user => {
@@ -72,17 +57,14 @@ class UserController {
             if (typeof email !== 'undefined') user.email = email;
             if (typeof password !== 'undefined') user.name = password;
 
-            return userModel.save().then(() => {
-               return res.json({usuario: userModel.getUserDecrypt()});
+            return user.save().then(() => {
+               return res.json({user: user.getUserDecrypt()});
             }).catch(next);
         }).catch(next);
     };
 
 
-    /**
-     * Remove user in the store
-     */
-    removeUser(req, res, next) {
+    removeUserAccount(req, res, next) {
         const id = req.payload._id;
         userModel.findByIdAndRemove(id).then(() => {
             res.json({message: 'Sua conta foi excluida!'});
@@ -132,9 +114,6 @@ class UserController {
     };
 
 
-    /**
-     *
-     */
     finishRecovery(req, res, next) {
         const {token, password} = req.body;
         if(!token || !password) return res.render('recovery/store', {   error: "Preencha novamente com sua nova senha",

@@ -2,12 +2,11 @@ const expressjwt = require('express-jwt');
 const secret = require('../config/config').secret;
 
 const getToken = (req) => {
-    if(!req.header.authorization) return null;
-    const token = req.header.authorization.split(' ')[1];
+    if(!req.headers.authorization) return null;
+    const token = req.headers.authorization.split(' ');
     if(token[0] !== "Bearer") return null;
     return token[1];
 };
-console.log(process.env.JWT_SECRET)
 
 const auth = {
     required: expressjwt({
