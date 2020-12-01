@@ -1,5 +1,5 @@
-const jwt = require('express-jwt');
-const secret = require('/api/config/config').secret;
+const expressjwt = require('express-jwt');
+const secret = require('../config/config').secret;
 
 const getToken = (req) => {
     if(!req.header.authorization) return null;
@@ -7,16 +7,19 @@ const getToken = (req) => {
     if(token[0] !== "Bearer") return null;
     return token[1];
 };
+console.log(process.env.JWT_SECRET)
 
 const auth = {
-    required: jwt({
-        secret,
+    required: expressjwt({
+        secret: secret,
+        algorithms: ['sha1', 'RS256', 'HS256'],
         userProperty: 'payload',
         getToken: getToken
     }),
 
-    optional: jwt({
-        secret,
+    optional: expressjwt({
+        secret: secret,
+        algorithms: ['sha1', 'RS256', 'HS256'],
         userProperty: 'payload',
         credentialsRequired: false,
         getToken: getToken

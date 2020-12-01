@@ -1,8 +1,8 @@
 // packages
 const compression = require("compression");
 const express = require("express");
+const body_parser = require('body-parser')
 const ejs = require("ejs");
-const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
@@ -13,7 +13,7 @@ const app = express();
 
 // enviroment
 const isProd = process.env.NODE_ENV === "production";
-const PORT = process.en.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 
 //  static files
@@ -22,9 +22,9 @@ app.use("/api/public/images", express.static(__dirname + "/api/public/images"));
 
 
 // db setup
-const db = require("./api/config/database");
+const db = require("../e-commerce/api/config/database.json");
 const dbURI = isProd ? db.dbProd : db.dbDev;
-mongoose.connect(dbURI, {userNewUrlParser: true});
+mongoose.connect(dbURI, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
 
 
 // setup ejs
@@ -39,18 +39,22 @@ app.use(compression());
 
 
 // setup body-parser
-app.use(bodyParser.urlencoded({extends: false, limit: 1.5*1024*1024}));
-app.use(bodyParser.json({limit: 1.5*1024*1024}));
+app.use(body_parser.json({limit: 1.5*1024*1024}));
+app.use(body_parser.urlencoded({extends: true, limit: 1.5*1024*1024}));
+
+// models
+require("../e-commerce/api/components/user/model");
 
 
 // loading routes
-app.use("/", require("/api/routes"))
+const routes = require('../e-commerce/api/routes');
+app.use("/", routes)
 
 
 // 404 - route
 app.use((req, res, next) => {
-   const err = new Error("Not Found");
-   err.status = 404
+    const err = new Error("Not Found");
+    err.status = 404
     next(err);
 });
 
@@ -61,6 +65,7 @@ app.use((err, req, res, next) => {
     if(err.status !== 404) console.warn("Error:", err.message, new Date());
     res.json({message: err.message, status: err.status})
 });
+
 
 // listener
 app.listen(PORT, (err) => {

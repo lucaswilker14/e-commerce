@@ -1,4 +1,4 @@
-const email = require('/api/config/email');
+const email = require('../config/email');
 const transporter = require('nodemailer').createTransport(email);
-const { root: link } = require("/api/config");
+// const { root: link } = require("/api/config/index");
 

@@ -3,7 +3,7 @@ const schema =          mongoose.Schema;
 const uniqueValidator = require('mongoose-unique-validator');
 const crypto =          require('crypto');
 const jwt =             require('jsonwebtoken');
-const secret =          require('/api/config/config').secret;
+const secret =          require('../../config/config').secret;
 
 const userSchema = new schema({
 
@@ -41,23 +41,24 @@ const userSchema = new schema({
     },
 
     hash: String,
+
     salt: String
 
 });
 
 userSchema.plugin(uniqueValidator, {message: 'is already being used'});
 
-userSchema.methods.encryptPassword = (password) => {
+userSchema.methods.encryptPassword = function(password) {
     this.salt = crypto.randomBytes(16).toString('hex');
     this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, "sha512").toString();
 };
 
-userSchema.methods.validatePassword = (password) => {
+userSchema.methods.validatePassword = function(password) {
     this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, "sha512").toString();
     return password === this.hash;
 }
 
-userSchema.methods.generateToken = () => {
+userSchema.methods.generateUserToken = function() {
     const today = new Date();
     const exp = new Date(today);
     exp.setDate(today.getDate() + 15);
@@ -70,24 +71,25 @@ userSchema.methods.generateToken = () => {
     }, secret);
 };
 
-userSchema.methods.getToken = () => {
+userSchema.methods.getUserDecrypt = function() {
     return {
+        id: this._id,
         name: this.name,
         email: this.email,
         store: this.store,
         role: this.role,
-        token: this.generateToken()
+        token: this.generateUserToken()
     }
 }
 
-userSchema.recoveryPassword = () => {
+userSchema.recoveryPassword = function() {
     this.recovery = {};
     this.recovery.token = crypto.randomBytes(16).toString('hex');
     this.recovery.date = new Date(new Date().getTime() + 24*60*60*1000);
     return this.recovery;
 };
 
-userSchema.methods.finishToken = () => {
+userSchema.methods.resetToken = function() {
     this.recovery = {token: null, date: null};
     return this.recovery;
 };
