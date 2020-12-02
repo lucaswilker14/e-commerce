@@ -2,8 +2,8 @@ import { Router } from 'express';
 import auth from '../../routes/auth';
 import StoreController from '../../components/store/controller';
 
-const router = Router();
-const storeController   = new StoreController();
+const router          = Router();
+const storeController = new StoreController();
 
 router.get('/', storeController.index);
 router.get('/:id', storeController.getStoreById);
