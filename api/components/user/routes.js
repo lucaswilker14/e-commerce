@@ -1,6 +1,9 @@
-const router = require('express').Router();
-const auth = require('../../routes/auth');
-const UserController = require('../user/controller')
+import express from 'express';
+import auth  from '../../routes/auth';
+import UserController from '../user/controller'
+
+const router = express.Router();
+
 const userController = new UserController();
 
 

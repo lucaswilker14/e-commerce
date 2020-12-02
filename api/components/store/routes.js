@@ -1,6 +1,8 @@
-const router            = require('express').Router();
-const auth              = require('../../routes/auth');
-const StoreController   = require('../store/controller')
+import express from 'express';
+import auth from '../../routes/auth';
+import StoreController from '../../components/store/controller';
+
+const router = express.Router();
 const storeController   = new StoreController();
 
 router.get('/', storeController.index);

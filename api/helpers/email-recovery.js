@@ -1,6 +1,7 @@
-const email = require('../config/email');
-const transporter = require('nodemailer').createTransport(email);
-const { api: link } = require("../config/config");
+import email from '../config/email';
+import { createTransport } from 'nodemailer'
+import { api as link } from '../config/config';
+const transporter = createTransport(email);
 
 module.exports = ({user, recovery}, callback) => {
     const message = `
