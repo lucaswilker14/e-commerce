@@ -3,7 +3,7 @@ const userModel = mongoose.model('User');
 const sendEmailRecovery = require('../../helpers/email-recovery');
 const recovery_view = '../api/components/user/views/recovery.ejs'
 const recoveryStore_view = '../api/components/user/views/store.ejs'
-
+import responses from '../util/http-responses'
 
 class UserController {
 
@@ -12,7 +12,7 @@ class UserController {
      */
     index(req, res, next) {
         userModel.findById(req.payload._id).then(user => {
-            if(!user) return res.status(401).json({error: "Usuário não cadastrado!"});
+            if(!user) return res.status(responses.unauthorized({error: "Usuário não cadastrado!"}));
             return res.json({user: user.getUserDecrypt()})
         }).catch(next);
     };
