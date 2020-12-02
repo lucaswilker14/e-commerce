@@ -1,8 +1,8 @@
-const mongoose          = require('mongoose');
-const schema            = mongoose.Schema;
-const uniqueValidator   = require('mongoose-unique-validator');
+import { Schema, model } from 'mongoose';
+import uniqueValidator from 'mongoose-unique-validator'
 
-const storeSchema = new schema ({
+
+const storeSchema = new Schema ({
     name: {
         type: String,
         required: true
@@ -47,4 +47,4 @@ const storeSchema = new schema ({
 
 storeSchema.plugin(uniqueValidator, {message: 'is already being used'});
 
-module.exports = mongoose.model('Store', storeSchema);
+module.exports = model('Store', storeSchema);

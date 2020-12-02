@@ -1,11 +1,11 @@
 // packages
-const compression   = require("compression");
-const express       = require("express");
-const body_parser   = require('body-parser')
-const ejs           = require("ejs");
-const mongoose      = require("mongoose");
-const morgan        = require("morgan");
-const cors          = require("cors");
+import compression from 'compression';
+import express from 'express';
+import body_parser from 'body-parser';
+import ejs from 'ejs';
+import mongoose from 'mongoose';
+import morgan from 'morgan';
+import cors from 'cors';
 
 
 // start application

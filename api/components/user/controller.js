@@ -1,8 +1,7 @@
-import mongoose from 'mongoose';
-import responses from '../util/http-responses'
+import { model } from 'mongoose';
 import sendEmailRecovery from '../../helpers/email-recovery';
 
-const userModel = mongoose.model('User');
+const userModel = model('User');
 const recovery_view = '../api/components/user/views/recovery.ejs'
 const recoveryStore_view = '../api/components/user/views/store.ejs'
 
@@ -14,7 +13,7 @@ class UserController {
      */
     index(req, res, next) {
         userModel.findById(req.payload._id).then(user => {
-            if(!user) return res.status(responses.unauthorized({error: "Usuário não cadastrado!"}));
+            if(!user) return res.status(401).json({error: "Usuário não cadastrado!"});
             return res.json({user: user.getUserDecrypt()})
         }).catch(next);
     };

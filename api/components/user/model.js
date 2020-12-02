@@ -1,12 +1,10 @@
-import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { secret } from '../../config/config'
 
-const schema = mongoose.Schema;
-
-const userSchema = new schema({
+const userSchema = new Schema ({
 
     name: {
         type: String,
@@ -23,7 +21,7 @@ const userSchema = new schema({
     },
 
     store: {
-        type: schema.Types.ObjectID,
+        type: Schema.Types.ObjectID,
         ref: 'store',
         required: [true, 'is required']
     },
@@ -95,4 +93,4 @@ userSchema.methods.resetToken = function() {
     return this.recovery;
 };
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = model('User', userSchema);
