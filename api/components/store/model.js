@@ -7,7 +7,7 @@ const storeSchema = new Schema ({
         type: String,
         required: true
     },
-    cnpj: {
+    CNPJ: {
         type: String,
         required: [true, "is required!"],
         unique: true
