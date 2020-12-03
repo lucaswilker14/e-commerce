@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import auth from '../../auth/auth';
-import storeValidation from '../../auth/storeValidation'
+import storeValidation from './storeValidation'
 import StoreController from '../../components/store/controller';
 
 const router          = Router();
