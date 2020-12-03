@@ -6,7 +6,7 @@ const required_id    = Joi.string().id().length(24).required();
 const required_optional  = Joi.string().optional();
 
 const getByIdValidator = Joi.object({
-    _id: required_id
+    id: required_id
 });
 
 const registerUserValidator = Joi.object({
