@@ -1,6 +1,7 @@
-const mongoose = require('mongoose');
-const userModel = mongoose.model('User');
-const sendEmailRecovery = require('../../helpers/email-recovery');
+import { model } from 'mongoose';
+import sendEmailRecovery from '../../helpers/email-recovery';
+
+const userModel = model('User');
 const recovery_view = '../api/components/user/views/recovery.ejs'
 const recoveryStore_view = '../api/components/user/views/store.ejs'
 
