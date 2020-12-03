@@ -37,7 +37,7 @@ class UserController {
         }).catch(next)
     };
 
-    registerUser(req, res, next) {
+    register(req, res, next) {
         const { name, email, password, store } = req.body;
         const new_user = new userModel({ name, email, store });
         new_user.encryptPassword(password)
@@ -80,6 +80,7 @@ class UserController {
      */
     createRecovery(req, res, next) {
         const { email } = req.body;
+        if(!email) return res.render('recovery', { error: "Preencha com o seu email", success: null });
         userModel.findOne({ email }).then((user) => {
             if(!user) return res.render(recovery_view, {error: "Usuário não cadastrado", success: null})
             const recoveryData = user.recoveryPassword();
@@ -95,6 +96,7 @@ class UserController {
      * GET Show view to recovery password
      */
     showFinishRecovery(req, res, next) {
+        if(!req.query.token) return res.render("recovery", { error: "Token não identificado", success: null });
         userModel.findOne({"recovery.token": req.query.token}).then((user) => {
             if(!user) return res.render(recovery_view, {error: "Não existe usuário com esse token", success: null});
             if(new Date(user.recovery.date) < new Date()) return res.render(recovery_view, {error: "Token expirado", success: null});
@@ -107,6 +109,8 @@ class UserController {
      */
     finishRecovery(req, res, next) {
         const { token, password } = req.body;
+        if(!token || !password) return res.render("recovery/store", {   error: "Preencha novamente com sua nova senha",
+                                                                        success: null, token: token });
         userModel.findOne({ "recovery.token": token }).then((user) => {
             if(!user) return res.render(recovery_view, {error: "Usuário não identificado", success: null});
             user.resetToken();

@@ -2,8 +2,8 @@ import Joi from 'joi';
 
 const required_only  = Joi.string().required();
 const required_email = Joi.string().email().required();
-const required_token = Joi.string().token().required();
-const required_id    = Joi.string().id().required();
+const required_id    = Joi.string().id().length(24).required();
+const required_optional  = Joi.string().optional();
 
 const getByIdValidator = Joi.object({
     _id: required_id
@@ -13,7 +13,7 @@ const registerUserValidator = Joi.object({
     name: required_only,
     email: required_email,
     password: required_only,
-    store: required_only
+    store: required_id
 });
 
 const loginValidator = Joi.object({
@@ -22,34 +22,13 @@ const loginValidator = Joi.object({
 });
 
 const updateUserValidator = Joi.object({
-    name: required_only,
-    email: required_email,
-    password: required_only
-});
-
-const removeUserValidator = Joi.object({
-    _id: required_id
-});
-
-const createRevoveryValidator = Joi.object({
-    email: required_email
-});
-
-const showFinishRecoveryValidator = Joi.object({
-    token: required_token
-});
-
-const finishRecoveryValidator = Joi.object({
-    token: required_token,
-    password: required_only
+    name: required_optional,
+    email: Joi.string().email().optional(),
+    password: required_optional
 });
 
 
 module.exports = {  getByIdValidator
                     , registerUserValidator
                     , loginValidator
-                    , updateUserValidator
-                    , removeUserValidator
-                    , createRevoveryValidator
-                    , showFinishRecoveryValidator
-                    , finishRecoveryValidator  };
+                    , updateUserValidator };
