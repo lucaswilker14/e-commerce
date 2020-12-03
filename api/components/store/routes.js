@@ -9,7 +9,7 @@ const storeController = new StoreController();
 router.get('/', storeController.index);
 router.get('/:id', storeController.getStoreById);
 
-router.post('/', auth.required, storeValidation, storeController.store);
+router.post('/', auth.required, storeValidation, storeController.registerStore);
 
 router.put('/:id', auth.required, storeValidation, storeController.update);
 

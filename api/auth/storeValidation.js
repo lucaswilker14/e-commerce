@@ -5,13 +5,13 @@ const storeModel = model('Store');
 
 const storeValidation = (id, store) => {
     if( !id || !store ) {
-        return false;
+        return true;
     }
 }
 
 const userValidation = (user, store) => {
-    if (!user || !user.store || !user.role.includes('admin') || user.store !== store) {
-        return false;
+    if (!user || !user.store || !user.role.includes('admin')) {
+        return true;
     }
 }
 
@@ -20,11 +20,11 @@ const storeFieldsValidation = () => {
 }
 
 module.exports = (req, res, next) => {
-    const { store } = req.query;
+    const { loja } = req.query;
     const { _id } = req.payload;
-    if (!storeValidation(_id, store)) return res.sendStatus(401);
+    if (!storeValidation(_id, loja)) return res.sendStatus(401);
     userModel.findById(_id).then((user) => {
-        if (!userValidation(user, store)) return res.sendStatus(401);
+        if (!userValidation(user, loja)) return res.sendStatus(401);
         next();
     }).catch(next)
 

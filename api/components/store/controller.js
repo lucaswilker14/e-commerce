@@ -5,7 +5,7 @@ class StoreController {
 
     index(req, res, next) {
         storeModel.find({}).select('_id name CNPJ email phones address')
-            .then(store => res.send({store}))
+            .then(stores => res.send({stores}))
             .catch(next);
     };
 
@@ -16,15 +16,13 @@ class StoreController {
             .catch(next);
     };
 
-
-    store(req, res, next) {
+    registerStore(req, res, next) {
         const { name, CNPJ, email, phones, address } = req.body;
         const new_store = new storeModel ({name, CNPJ, email, phones, address});
         new_store.save()
             .then(() =>  res.send({new_store}))
             .catch(next);
     };
-
 
     update(req, res, next) {
         const { name, CNPJ, email, phones, address } = req.body;
@@ -49,6 +47,5 @@ class StoreController {
             .catch(next);
     };
 }
-
 
 module.exports = StoreController;
