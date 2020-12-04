@@ -67,7 +67,7 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500);
     if(err.status !== 404) console.warn("Error:", err.message, new Date());
     if (err.status === 401) return res.status(err.status).send({message: err});
-    res.status(422).json({error: err.error.details});
+    res.status(422).json(err);
 });
 
 
