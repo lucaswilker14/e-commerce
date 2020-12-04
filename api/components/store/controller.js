@@ -10,10 +10,10 @@ class StoreController {
     };
 
     getStoreById(req, res, next) {
-        storeModel.findById(req.params.id)
+        storeModel.findById(req.params._id)
             .select('_id name CNPJ email phones address')
             .then(store => res.send({store}))
-            .catch(next);
+            .catch(res.send({findStore: false, store: 'Nenhuma Loja Encontrada'}));
     };
 
     registerStore(req, res, next) {
@@ -26,7 +26,7 @@ class StoreController {
 
     update(req, res, next) {
         const { name, CNPJ, email, phones, address } = req.body;
-        storeModel.findById(req.params.id)
+        storeModel.findById(req.query.loja)
             .then(store => {
                 store.name = name;
                 store.email = email;
@@ -38,7 +38,7 @@ class StoreController {
     };
 
     remove(req, res, next) {
-        storeModel.findById(req.params.id)
+        storeModel.findById(req.query.loja)
             .then(store => {
                store.remove()
                    .then(() => res.send({message: 'Sua Loja foi excluída com sucesso!'}))

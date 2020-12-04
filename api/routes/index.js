@@ -5,6 +5,6 @@ import storeRoutes from '../components/store/routes'
 const router = Router();
 
 router.use('/usuario', userRoutes);
-router.use('/loja', storeRoutes);
+router.use('/lojas', storeRoutes);
 
 module.exports = router;
