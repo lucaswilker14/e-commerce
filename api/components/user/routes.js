@@ -12,7 +12,7 @@ const validator = createValidator({passError: true});
 const userController = new UserController();
 
 
-router.post('/cadastro', validator.body(registerUserValidator), userController.register);
+router.post('/cadastro', validator.body(registerUserValidator), userController.signup);
 router.post('/login', validator.body(loginValidator), userController.login);
 
 router.put('/', auth.required, validator.body(updateUserValidator), userController.update)
