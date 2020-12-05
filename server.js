@@ -6,6 +6,7 @@ import ejs from 'ejs';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import cors from 'cors';
+import path from 'path'
 
 
 // start application
@@ -18,8 +19,9 @@ const PORT = process.env.PORT || 3000;
 
 
 //  static files
-app.use("/api/public", express.static(__dirname + "../ecommerce/api/public"));
-app.use("/api/public/images", express.static(__dirname + "../ecommerce/api/public/images"));
+
+app.use(express.static(path.join(__dirname, '/api/public')));
+app.use("/api/public/images", express.static(__dirname + "../api/public/images"));
 
 
 // db setup
@@ -28,9 +30,14 @@ const dbURI = isProd ? db.dbProd : db.dbDev;
 mongoose.connect(dbURI, {useNewUrlParser: true, useCreateIndex: true,
                                 useUnifiedTopology: true, useFindAndModify: false});
 
+// Set 'views' directory for any views
+// being rendered res.render()
+// app.set('views', path.join(__dirname, '/api/components/user/views'));
+app.set('views', path.join(__dirname, '/api/components/user/views'));
 
-// setup ejs
-app.set("view engine", "ejs");
+// Set view engine as EJS
+app.engine('ejs', require('ejs').renderFile);
+app.set('view engine', 'ejs');
 
 
 // others configs
