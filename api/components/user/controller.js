@@ -1,90 +1,61 @@
 import { model } from 'mongoose';
 import sendEmailRecovery from '../../helpers/email-recovery';
+import { compare } from 'bcrypt'
+
+const recovery_view = '../views/recovery.ejs';
+const recovery_store_view = '../views/store.ejs';
 
 const userModel = model('User');
-const recovery_view = '../api/components/user/views/recovery.ejs'
-const recoveryStore_view = '../api/components/user/views/store.ejs'
-
 
 class UserController {
 
-    /**
-     * return users datas logged into the store
-     */
-    index(req, res, next) {
-        userModel.findById(req.payload._id).then(user => {
-            if(!user) return res.status(401).json({error: "Usuário não cadastrado!"});
-            return res.json({user: user.getUserDecrypt()})
-        }).catch(next);
-    };
-
-    getUserById(req, res, next) {
-        userModel.findById(req.params.id).then(user => {
-            if(!user) return res.status(401).json({error: "Usuário não cadastrado!"});
-            return res.json({ user: {nome:   user.name,
-                                        email:  user.email,
-                                        role:   user.role,
-                                        loja:   user.store}});
-        }).catch(next);
-    }
-
-    login(req, res, next) {
-        const { email, password } = req.body;
-        if(!email) return res.status(422).json({errors: {email: "Email não pode ficar vazio"}});
-        if(!password) return res.status(422).json({errors: {email: "Senha não pode ficar vazio"}});
-        userModel.findOne({email}).then((user) => {
-            if(!user) return res.status(422).json({errors: {email: "Usuário não está cadastrado"}});
-            if(!user.validatePassword(password)) return res.status(422).json({errors: {email: "Senha Inválida"}});
-            return res.json({user: user.getUserDecrypt()});
-        }).catch(next)
-    };
-
-    registerUser(req, res, next) {
+    async signup(req, res, next) {
         const { name, email, password, store } = req.body;
-        if(!name || !email || !password || !store) return res.status(422).json({errors: "Preencha os campos de cadastro!"})
-        const new_user = new userModel({ name, email, store });
-        new_user.encryptPassword(password)
-        new_user.save()
-            .then(() => res.json({user: new_user.getUserDecrypt()}))
-            .catch(next)
+        const new_user = new userModel({ name, email, password, store });
+        await new_user.save()
+            .then(() => res.json({user: new_user.getModelUser(), message: "Cadastro Realizado com Sucesso!"}))
+            .catch(next);
     };
 
-    update(req, res, next) {
+    async login(req, res, next) {
+        const { email, password } = req.body;
+        await userModel.findOne({ email }).select('+password').then(async user =>  {
+            if (!user) return res.send({error: 'Usuário não encontrado!'}).status(404);
+            if (!await compare(password, user.password)) return res.send({error: "Senha Inválida"}).status(400);
+            const token = user.generateUserToken()
+            return res.send({user: user.getModelUser(), token});
+        });
+    };
+
+    async update(req, res, next) {
         const { name, email, password } = req.body;
-        userModel.findById(req.payload._id).then(user => {
+        await userModel.findById(req.payload._id).select('+password').then(user => {
             if (!user) return res.status(401).json({errors: 'Usuário não cadastrado!'});
             if (typeof name !== 'undefined') user.name = name;
             if (typeof email !== 'undefined') user.email = email;
-            if (typeof password !== 'undefined') user.name = password;
-
+            if (typeof password !== 'undefined') user.password = password;
             return user.save().then(() => {
-               return res.json({user: user.getUserDecrypt()});
+                return res.json({user: user.getModelUser(), message: 'Cadastro Atualizado'});
             }).catch(next);
         }).catch(next);
     };
 
-    removeUserAccount(req, res, next) {
+    async removeUserAccount(req, res, next) {
         const id = req.payload._id;
-        userModel.findByIdAndRemove(id).then(user => {
+        await userModel.findByIdAndRemove(id).then(user => {
             if(!user) return res.status(404).json({error: "Usuário não cadastrado"})
             res.json({message: 'Sua conta foi excluida!'});
         }).catch(next);
     };
 
-    /**
-     * Return view to recovery
-     */
     showRecovery(req, res, next) {
-        return res.render(recovery_view, {error: null, success: null});
+        return res.render('../views/recovery.ejs', {error: null, success: null});
     };
 
-    /**
-     * POST to recovery password
-     */
-    createRecovery(req, res, next) {
+    async createRecovery(req, res, next) {
         const { email } = req.body;
-        if(!email) return res.render(recovery_view, {error: "Preencha com seu email", success: null})
-        userModel.findOne({ email }).then((user) => {
+        if(!email) return res.render('recovery', { error: "Preencha com o seu email", success: null });
+        await userModel.findOne({ email }).select('+password').then((user) => {
             if(!user) return res.render(recovery_view, {error: "Usuário não cadastrado", success: null})
             const recoveryData = user.recoveryPassword();
             return user.save().then(() => {
@@ -95,38 +66,48 @@ class UserController {
         }).catch(next)
     };
 
-    /**
-     * GET Show view to recovery password
-     */
-    showFinishRecovery(req, res, next) {
-        if(!req.query.token) return res.render(recovery_view, {error: "Token não identificado", success: null});
-        userModel.findOne({"recovery.token": req.query.token}).then((user) => {
+    async showFinishRecovery(req, res, next) {
+        if(!req.query.token) return res.render("recovery", { error: "Token não identificado", success: null });
+        await userModel.findOne({"recovery.token": req.query.token}).then((user) => {
             if(!user) return res.render(recovery_view, {error: "Não existe usuário com esse token", success: null});
             if(new Date(user.recovery.date) < new Date()) return res.render(recovery_view, {error: "Token expirado", success: null});
-            return res.render(recoveryStore_view, {error: null, success: null, token: req.query.token});
+            return res.render(recovery_store_view, {error: null, success: null, token: req.query.token});
         }).catch(next);
     };
 
-    /**
-     * Updates the new password after the recovery password
-     */
-    finishRecovery(req, res, next) {
+    async finishRecovery(req, res, next) {
         const { token, password } = req.body;
-
-        if(!token || !password) return res.render(recoveryStore_view,
-            {error: "Preencha novamente com sua nova senha", success: null});
-
-        userModel.findOne({ "recovery.token": token }).then((user) => {
+        if(!token || !password) return res.render(recovery_store_view, {   error: "Preencha novamente com sua nova senha",
+                                                                        success: null, token: token });
+        await userModel.findOne({ "recovery.token": token }).select('+password').then(async (user) => {
             if(!user) return res.render(recovery_view, {error: "Usuário não identificado", success: null});
             user.resetToken();
-            user.encryptPassword(password);
+            user.password = password;
             return user.save().then(() => {
-                return res.render(recoveryStore_view, {   error: null,
+                return res.render(recovery_store_view, {   error: null,
                                                         success: "Senha alterada com Sucesso",
                                                         token: null });
             }).catch(next);
         }).catch(next);
     }
+
+    async index(req, res, next) {
+        try {
+            await userModel.findById(req.payload._id).then(user => {
+                if(!user) return res.status(401).json({error: "Usuário não cadastrado!"});
+                return res.json({user: user.getModelUser()});
+            }).catch(next);
+        }catch (next) {
+            return null;
+        }
+    };
+
+    async getUserById(req, res, next) {
+        await userModel.findById(req.params.id).then(user => {
+            if(!user) return res.status(401).json({error: "Usuário não cadastrado!"});
+            return res.json({ user: user.getModelUser()});
+        }).catch(next);
+    };
 
 }
 

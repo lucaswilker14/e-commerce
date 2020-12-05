@@ -1,11 +1,13 @@
 import expressjwt from 'express-jwt';
 import { secret } from '../config/config'
 
-const getToken = (req) => {
+const getToken = (req, res, next) => {
     if(!req.headers.authorization) return null;
-    const token = req.headers.authorization.split(' ');
-    if(token[0] !== "Bearer") return null;
-    return token[1];
+    const parts = req.headers.authorization.split(' ');
+    const [ schema, token ] = parts;
+    if (!/^Bearer$/i.test(schema)) return res.status(401).send({error: 'Token mal formado'});
+    return token;
+
 };
 
 const auth = {

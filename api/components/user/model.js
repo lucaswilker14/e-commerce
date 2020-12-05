@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
-import crypto from 'crypto';
+import { genSaltSync, hashSync } from 'bcrypt';
+import { randomBytes } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { secret } from '../../config/config'
 
@@ -20,6 +21,12 @@ const userSchema = new Schema ({
         match: [/\S+@\S+\.\S+/, 'email is invalid']
     },
 
+    password: {
+        type: String,
+        required: true,
+        select: false
+    },
+
     store: {
         type: Schema.Types.ObjectID,
         ref: 'store',
@@ -37,53 +44,40 @@ const userSchema = new Schema ({
             date: Date
         },
         default: {}
-    },
-
-    hash: String,
-
-    salt: String
-
+    }
 });
 
 userSchema.plugin(uniqueValidator, {message: 'is already being used'});
 
-userSchema.methods.encryptPassword = function(password) {
-    this.salt = crypto.randomBytes(16).toString('hex');
-    this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, "sha512").toString();
-};
+userSchema.pre('save', async function(next) {
+    const salt = await genSaltSync(10);
+    this.password = await hashSync(this.password, salt);
+    next();
+});
 
-userSchema.methods.validatePassword = function(password) {
-    const hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, "sha512").toString();
-    return hash === this.hash;
-}
 
 userSchema.methods.generateUserToken = function() {
-    const today = new Date();
-    const exp = new Date(today);
-    exp.setDate(today.getDate() + 15);
-
     return jwt.sign({
         _id: this._id,
         name: this.name,
-        email: this.email,
-        exp: parseFloat(exp.getTime() / 1000, 10)
-    }, secret);
+        email: this.email
+    }, secret, {expiresIn: '1h'});
 };
 
-userSchema.methods.getUserDecrypt = function() {
+
+userSchema.methods.getModelUser = function() {
     return {
         id: this._id,
         name: this.name,
         email: this.email,
         store: this.store,
-        role: this.role,
-        token: this.generateUserToken()
+        role: this.role
     }
 };
 
 userSchema.methods.recoveryPassword = function() {
     this.recovery = {};
-    this.recovery.token = crypto.randomBytes(16).toString('hex');
+    this.recovery.token = randomBytes(16).toString('hex');
     this.recovery.date = new Date(new Date().getTime() + 24*60*60*1000);
     return this.recovery;
 };
