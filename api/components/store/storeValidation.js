@@ -11,30 +11,25 @@ const userModel = model('User');
 
 const isAdmin = (req, res, next) => {
     if (!req.payload._id) return res.sendStatus('401');
-    const { loja } = req.query;
-    if (!loja) return res.sendStatus('401');
+    if (!req.query.loja) return res.sendStatus('401');
     userModel.findById(req.payload._id)
         .then(user => {
             if (!user) return res.sendStatus('401');
             if (!user.store) return res.sendStatus('401');
             if (!user.role.includes('admin')) return res.sendStatus('401');
-            if (user.store.toString() !== loja) return res.sendStatus('401');
+            if (user.store.toString() !== req.query.loja) return res.sendStatus('401');
             next();
         })
         .catch(next);
 }
 
-const getStoreById = Joi.object({
-   id:  required_id
-});
-
 const registerStore = Joi.object({
-        name:     required_only
+    name:     required_only
     ,   CNPJ:     Joi.string().length(18).required()
     ,   email:    required_email
     ,   phones:   Joi.array().items(required_only).required()
     ,   address:  Joi.object({
-            street:         required_only
+        street:         required_only
         ,   number:         required_only
         ,   complement:     required_only
         ,   neighborhood:   required_only
@@ -44,7 +39,7 @@ const registerStore = Joi.object({
 });
 
 const update = Joi.object({
-        name:     required_optional
+    name:     required_optional
     ,   CNPJ:     Joi.string().length(18).optional()
     ,   email:    required_optional.email()
     ,   phones:   Joi.array().items(required_only).optional()
@@ -56,6 +51,10 @@ const update = Joi.object({
         , city: required_only
         , CEP: required_only
     }).optional()
+});
+
+const getStoreById = Joi.object({
+   id:  required_id
 });
 
 
