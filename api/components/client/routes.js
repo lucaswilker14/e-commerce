@@ -15,7 +15,7 @@ router.get('/', auth.required, isAdmin, clientController.index);
 // router.get('/buscar/:id/pedidos', auth.required, isAdmin, clientController.searchOrders);
 router.get('/buscar/:id', auth.required, isAdmin, clientController.searchClient);
 router.get('/admin/:id', auth.required, isAdmin, clientController.getAdmin);
-// router.get('/admin/:id/:pedidos', auth.required, isAdmin, clientController.getAllOrderClients);
+// router.get('/admin/:id/pedidos', auth.required, isAdmin, clientController.getAllOrderClients);
 
 router.put('/admin/:id', auth.required, isAdmin, clientController.update);
 
