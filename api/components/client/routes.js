@@ -23,7 +23,7 @@ const validator         = createValidator({passError: true});
 //admin
 router.get('/', auth.required, isAdmin, validator.query(index), clientController.index);
 
-router.get('/buscar/:search', auth.required, isAdmin, validator.query(searchClient.query),
+router.get('/search/:search', auth.required, isAdmin, validator.query(searchClient.query),
     validator.params(searchClient.params), clientController.searchClient);
 
 router.get('/admin/:id', auth.required, isAdmin, validator.params(getAdmin), clientController.getAdmin);

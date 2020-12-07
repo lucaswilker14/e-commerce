@@ -3,13 +3,14 @@ import Joi from 'joi';
 const required_only     = Joi.string().required();
 const required_id       = Joi.string().id().length(24).required();
 const required_optional = Joi.string().optional();
-const required_number   = Joi.number();
+const required_number   = Joi.number().optional();
 
 
 // admin
 const index = Joi.object({
     offset: required_number,
-    limit:  required_number
+    limit:  required_number,
+    loja: required_optional
 });
 
 const searchOrders = Joi.object({
@@ -19,7 +20,9 @@ const searchOrders = Joi.object({
 const searchClient = {
     query:  Joi.object({
         offset: required_number,
-        limit:  required_number
+        limit:  required_number,
+        loja: required_optional
+
     }),
     params: Joi.object({
         search: required_only
@@ -51,7 +54,7 @@ const updateAdmin = {
             , city: required_only
             , CEP: required_only
         }).optional()
-        , dateOfBirth: Joi.date().format("YYYY-MM-DD").raw().optional()
+        , dateOfBirth: Joi.date().optional()
     })
 };
 
@@ -63,11 +66,11 @@ const getClient = Joi.object({
 
 const createInStore = {
     query: Joi.object({
-        store: required_id
+        loja: required_id
     }),
     body: Joi.object({
         name: required_only
-        , email: required_email
+        , email: required_only.email()
         , CPF: required_only
         , phones: Joi.array().items(required_only).optional()
         , address: Joi.object({
@@ -78,7 +81,7 @@ const createInStore = {
             , city: required_only
             , CEP: required_only
         }).optional()
-        , dateOfBirth: Joi.date().format("YYYY-MM-DD").raw().optional()
+        , dateOfBirth: Joi.date().optional()
         , password: required_only
     })
 };
@@ -101,7 +104,7 @@ const updateClient = {
             , city: required_only
             , CEP: required_only
         }).optional()
-        , dateOfBirth: Joi.date().format("YYYY-MM-DD").raw().optional()
+        , dateOfBirth: Joi.date().optional()
         , password: required_optional
     })
 };

@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import paginate  from 'mongoose-paginate';
+import uniqueValidator from 'mongoose-unique-validator';
 
 
 const clientSchema = new Schema({
@@ -20,7 +21,8 @@ const clientSchema = new Schema({
     },
 
     phones: {
-        type: [{ type: String }]
+        type: [{ type: String }],
+        required: [true, 'is required']
     },
 
     deleted: {
@@ -32,32 +34,32 @@ const clientSchema = new Schema({
         type: {
             street: {
                 type: String,
-                required: true
+                required: [true, 'is required']
             },
             number: {
                 type: String,
-                required: true
+                required: [true, 'is required']
             },
             complement: {
                 type: String
             },
             neighborhood: {
                 type: String,
-                required: true
+                required: [true, 'is required']
             },
             city: {
                 type: String,
-                required: true
+                required: [true, 'is required']
             },
             state: {
                 type: String,
-                required: true
+                required: [true, 'is required']
             },
             CEP: {
                 type: String,
-                required: true
+                required: [true, 'is required']
             }
-        }, required: true
+        }, required: [true, 'is required']
     },
 
     user: {
@@ -73,6 +75,8 @@ const clientSchema = new Schema({
 
 });
 
+clientSchema.plugin(uniqueValidator, {message: 'is already being used'});
 clientSchema.plugin(paginate);
+
 
 module.exports = model('Client', clientSchema);

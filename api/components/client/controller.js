@@ -74,10 +74,10 @@ class ClientController {
     async createInStore(req, res, next) {
         try {
             const { name, email, CPF, phones, address, dateOfBirth, password } = req.body;
-            const new_user = new userModel({ name, email, password, store: req.query });
+            const new_user = new userModel({ name, email, password, store: req.query.loja });
             await new_user.save();
             const new_client = new clientModel({ name, dateOfBirth, CPF, phones, address,
-                user: new_user._id, store: req.query });
+                user: new_user._id, store: req.query.loja });
             await new_client.save();
 
             return res.send({ client: Object.assign({}, new_client._doc, { email: new_user.email }),
