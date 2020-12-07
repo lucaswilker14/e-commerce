@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import StoreController from '../../components/store/controller';
-import auth from '../../auth/auth';
 import { isAdmin, getStoreById, registerStore, update } from './storeValidation'
-import { createValidator} from "express-joi-validation";
+import { createValidator } from "express-joi-validation";
+import auth from '../../auth/auth';
 
 
-const router          = Router();
-const storeController = new StoreController();
-const validator = createValidator({passError: true});
+const router            = Router();
+const storeController   = new StoreController();
+const validator         = createValidator({passError: true});
 
 
 router.post('/', auth.required, validator.body(registerStore), storeController.registerStore);
