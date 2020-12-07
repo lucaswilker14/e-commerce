@@ -1,7 +1,17 @@
 import { Router } from 'express';
 import ClientController from '../../components/client/controller';
-import { isAdmin, getStoreById, registerStore, update } from '../store/storeValidation'
-import { isAdmin, getStoreById, registerStore, update } from './clientValidation'
+import { isAdmin } from '../store/storeValidation'
+import { index
+    , searchOrders
+    , searchClient
+    , getAdmin
+    , getAllOrderClients
+    , updateAdmin
+    , getClient
+    , createInStore
+    , updateClient
+
+} from './clientValidation'
 import { createValidator } from "express-joi-validation";
 import auth from '../../auth/auth';
 
@@ -11,20 +21,26 @@ const validator         = createValidator({passError: true});
 
 
 //admin
-router.get('/', auth.required, isAdmin, clientController.index);
-// router.get('/buscar/:id/pedidos', auth.required, isAdmin, clientController.searchOrders);
-router.get('/buscar/:id', auth.required, isAdmin, clientController.searchClient);
-router.get('/admin/:id', auth.required, isAdmin, clientController.getAdmin);
-// router.get('/admin/:id/pedidos', auth.required, isAdmin, clientController.getAllOrderClients);
+router.get('/', auth.required, isAdmin, validator.query(index), clientController.index);
 
-router.put('/admin/:id', auth.required, isAdmin, clientController.update);
+router.get('/buscar/:search', auth.required, isAdmin, validator.query(searchClient.query),
+    validator.params(searchClient.params), clientController.searchClient);
+
+router.get('/admin/:id', auth.required, isAdmin, validator.params(getAdmin), clientController.getAdmin);
+
+router.put('/admin/:id', auth.required, isAdmin, validator.params(updateAdmin.params),
+    validator.body(updateAdmin.body), clientController.updateAdmin);
 
 //client
-router.get('/:id', auth.required, clientController.getClient);
+router.get('/:id', auth.required, validator.query(getClient), clientController.getClient);
 
-router.post('/', clientController.createInStore);
-router.put('/:id', auth.required, clientController.update);
-router.delete('/:id', auth.required, clientController.remove);
+router.post('/', validator.query(createInStore.query),
+    validator.body(createInStore.body), clientController.createInStore);
+
+router.put('/:id', auth.required, validator.query(updateClient.query),
+    validator.params(updateClient.params), validator.body(updateClient.body), clientController.updateClient);
+
+router.delete('/:id', auth.required, clientController.removeClient);
 
 
 module.exports = router;
