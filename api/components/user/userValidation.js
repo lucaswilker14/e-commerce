@@ -17,14 +17,14 @@ const registerUserValidator = Joi.object({
 });
 
 const loginValidator = Joi.object({
-    email: required_email,
-    password: required_only
+    email: required_email
+    , password: required_only
 });
 
 const updateUserValidator = Joi.object({
-    name: required_optional,
-    email: Joi.string().email().optional(),
-    password: required_optional
+    name: required_optional
+    , email: Joi.string().email().optional()
+    , password: required_optional
 });
 
 

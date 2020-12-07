@@ -1,13 +1,8 @@
 import { Schema, model } from 'mongoose';
-import { paginate } from 'mongoose-paginate';
+import paginate  from 'mongoose-paginate';
+
 
 const clientSchema = new Schema({
-
-    user: {
-        type: Schema.Types.ObjectID,
-        ref: 'user',
-        required: [true, 'is required']
-    },
 
     name: {
         type: String,
@@ -31,11 +26,6 @@ const clientSchema = new Schema({
     deleted: {
         type: Boolean,
         default: false
-    },
-
-    store: {
-        type: Schema.Types.ObjectID,
-        required: [true, 'is required']
     },
 
     address: {
@@ -68,6 +58,17 @@ const clientSchema = new Schema({
                 required: true
             }
         }, required: true
+    },
+
+    user: {
+        type: Schema.Types.ObjectID,
+        ref: 'user',
+        required: [true, 'is required']
+    },
+
+    store: {
+        type: Schema.Types.ObjectID,
+        required: [true, 'is required']
     }
 
 });
