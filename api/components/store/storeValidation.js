@@ -2,11 +2,11 @@ import Joi from 'joi';
 import { model } from 'mongoose';
 
 
-const required_only  = Joi.string().required();
-const required_email = Joi.string().email().required();
-const required_optional  = Joi.string().optional();
-const required_id       = Joi.string().id().length(24).required();
-const userModel = model('User');
+const required_only         = Joi.string().required();
+const required_email        = Joi.string().email().required();
+const required_optional     = Joi.string().optional();
+const required_id           = Joi.string().id().length(24).required();
+const userModel             = model('User');
 
 
 const isAdmin = (req, res, next) => {
@@ -24,32 +24,32 @@ const isAdmin = (req, res, next) => {
 }
 
 const registerStore = Joi.object({
-    name:     required_only
-    ,   CNPJ:     Joi.string().length(18).required()
-    ,   email:    required_email
-    ,   phones:   Joi.array().items(required_only).required()
-    ,   address:  Joi.object({
-        street:         required_only
-        ,   number:         required_only
-        ,   complement:     required_only
-        ,   neighborhood:   required_only
-        ,   city:           required_only
-        ,   CEP:            required_only
+    name:       required_only
+    , CNPJ:     Joi.string().length(18).required()
+    , email:    required_email
+    , phones:   Joi.array().items(required_only).required()
+    , address:  Joi.object({
+        street:           required_only
+        , number:         required_only
+        , complement:     required_only
+        , neighborhood:   required_only
+        , city:           required_only
+        , CEP:            required_only
     }).required()
 });
 
 const update = Joi.object({
-    name:     required_optional
-    ,   CNPJ:     Joi.string().length(18).optional()
-    ,   email:    required_optional.email()
-    ,   phones:   Joi.array().items(required_only).optional()
-    ,   address:  Joi.object({
-        street: required_only
-        , number: required_only
-        , complement: required_only
+        name:       required_optional
+    ,   CNPJ:       Joi.string().length(18).optional()
+    ,   email:      required_optional.email()
+    ,   phones:     Joi.array().items(required_only).optional()
+    ,   address:    Joi.object({
+        street:         required_only
+        , number:       required_only
+        , complement:   required_only
         , neighborhood: required_only
-        , city: required_only
-        , CEP: required_only
+        , city:         required_only
+        , CEP:          required_only
     }).optional()
 });
 

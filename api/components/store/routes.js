@@ -17,6 +17,7 @@ router.put('/:id', auth.required, isAdmin, validator.body(update), storeControll
 router.delete('/:id', auth.required, isAdmin, storeController.remove);
 
 router.get('/', storeController.index);
+
 router.get('/:id', validator.params(getStoreById), storeController.getStoreById);
 
 
