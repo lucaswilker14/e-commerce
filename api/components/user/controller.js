@@ -15,7 +15,7 @@ class UserController {
         try {
             const { name, email, password, store } = req.body;
             const new_user = new userModel({ name, email, password, store });
-            if (!await UserController.hasStore(store)) return res.json({message: "Loja não cadastrada!"});
+            // if (!await UserController.hasStore(store)) return res.json({message: "Loja não cadastrada!"});
             await new_user.save()
                 .then(() => res.json({user: new_user.getModelUser(), message: "Cadastro Realizado com Sucesso!"}))
                 .catch(next);

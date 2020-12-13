@@ -15,9 +15,10 @@ const isAdmin = (req, res, next) => {
     userModel.findById(req.payload._id)
         .then(user => {
             if (!user) return res.sendStatus('401');
-            if (!user.store) return res.sendStatus('401');
+            if (!user.store) return res.send({message: 'Loja não cadastrada'}).status('401');
             if (!user.role.includes('admin')) return res.sendStatus('401');
-            if (user.store.toString() !== req.query.loja) return res.sendStatus('401');
+            if (user.store.toString() !== req.query.loja) return res.send({message: 'Loja não cadastrada'})
+                                                                    .status('401');
             next();
         })
         .catch(next);

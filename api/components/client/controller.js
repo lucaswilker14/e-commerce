@@ -1,6 +1,7 @@
 import { model } from 'mongoose';
-const clientModel = model('Client');
-const userModel = model('User');
+const clientModel   = model('Client');
+const userModel     = model('User');
+const storeModel    = model('Store');
 
 
 class ClientController {
@@ -8,6 +9,7 @@ class ClientController {
 
     // admin methods
     async index(req, res, next) {
+        console.log('sakdaskjhdjashdjkashjd')
         try {
             const offset = Number(req.query.offset) || 0;
             const limit = Number(req.query.limit) || 30;
@@ -24,6 +26,7 @@ class ClientController {
     };
 
     async searchClient(req, res, next) {
+        console.log('erradooo')
         try {
             const offset = Number(req.query.offset) || 0;
             const limit = Number(req.query.limit) || 30;
@@ -64,8 +67,11 @@ class ClientController {
     // client methods
     async getClient(req, res, next) {
         try {
-            const client = await clientModel.findOne({ user: req.payload.id, store: req.query.loja }).populate('User');
-            return res.send(client);
+            const client = await clientModel
+                .findOne({ user: req.payload._id, store: req.query.loja })
+                .populate("user")
+            if (!client) return res.send('Cliente não encontrado')
+            return res.send({client});
         }catch (e) {
             next(e);
         }
@@ -73,13 +79,14 @@ class ClientController {
 
     async createInStore(req, res, next) {
         try {
+            if (!await ClientController.hasStore(req.query.loja)) return res.send({message: 'Id da Loja Inválido'})
+                .status('401')
             const { name, email, CPF, phones, address, dateOfBirth, password } = req.body;
             const new_user = new userModel({ name, email, password, store: req.query.loja });
             await new_user.save();
             const new_client = new clientModel({ name, dateOfBirth, CPF, phones, address,
                 user: new_user._id, store: req.query.loja });
             await new_client.save();
-
             return res.send({ client: Object.assign({}, new_client._doc, { email: new_user.email }),
                 message: "Cliente Cadastrado com Sucesso!"});
         } catch (e) {
@@ -128,6 +135,14 @@ class ClientController {
         await client.user.save();
         await client.save();
     }
+
+    static async hasStore(store_id) {
+        try {
+            return await storeModel.findById(store_id);
+        }catch (e) {
+            console.log(e);
+        }
+    };
 
 }
 

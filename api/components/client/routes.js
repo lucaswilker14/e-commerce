@@ -21,18 +21,19 @@ const validator         = createValidator({passError: true});
 
 
 //admin
-router.get('/', auth.required, isAdmin, validator.query(index), clientController.index);
+router.get('/', auth.required, isAdmin, validator.query(index), clientController.index); //ok
 
 router.get('/search/:search', auth.required, isAdmin, validator.query(searchClient.query),
-    validator.params(searchClient.params), clientController.searchClient);
+    validator.params(searchClient.params), clientController.searchClient); // ok
 
 router.get('/admin/:id', auth.required, isAdmin, validator.params(getAdmin), clientController.getAdmin);
 
 router.put('/admin/:id', auth.required, isAdmin, validator.params(updateAdmin.params),
     validator.body(updateAdmin.body), clientController.updateAdmin);
 
+
 //client
-router.get('/:id', auth.required, validator.query(getClient), clientController.getClient);
+router.get('/:id', auth.required, validator.query(getClient), clientController.getClient); // ok
 
 router.post('/', validator.query(createInStore.query),
     validator.body(createInStore.body), clientController.createInStore);

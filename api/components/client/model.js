@@ -59,17 +59,20 @@ const clientSchema = new Schema({
                 type: String,
                 required: [true, 'is required']
             }
-        }, required: [true, 'is required']
+        },
+        required: [true, 'is required']
+
     },
 
     user: {
-        type: Schema.Types.ObjectID,
-        ref: 'user',
+        type: Schema.Types.ObjectId,
+        ref: 'User',
         required: [true, 'is required']
     },
 
     store: {
-        type: Schema.Types.ObjectID,
+        type: Schema.Types.ObjectId,
+        ref: 'Store',
         required: [true, 'is required']
     }
 

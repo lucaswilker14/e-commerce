@@ -18,7 +18,8 @@ const userSchema = new Schema ({
         unique: true,
         required: [true, "is required"],
         index: true,
-        match: [/\S+@\S+\.\S+/, 'email is invalid']
+        match: [/\S+@\S+\.\S+/, 'email is invalid'],
+        select: true
     },
 
     password: {
@@ -28,7 +29,7 @@ const userSchema = new Schema ({
     },
 
     store: {
-        type: Schema.Types.ObjectID,
+        type: Schema.Types.ObjectId,
         ref: 'store',
         required: [true, 'is required']
     },
