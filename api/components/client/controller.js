@@ -9,11 +9,10 @@ class ClientController {
 
     // admin methods
     async index(req, res, next) {
-        console.log('sakdaskjhdjashdjkashjd')
         try {
             const offset = Number(req.query.offset) || 0;
             const limit = Number(req.query.limit) || 30;
-            const clients = await clientModel.paginate({ store: req.query.loja }, {offset, limit, populate: "User"});
+            const clients = await clientModel.paginate({ store: req.query.loja }, {offset, limit, populate: "user"});
             if (!clients) return res.send({message: "Algo estranho aconteceu!"});
             return res.send({ clients });
         }catch (e) {
@@ -26,12 +25,11 @@ class ClientController {
     };
 
     async searchClient(req, res, next) {
-        console.log('erradooo')
         try {
             const offset = Number(req.query.offset) || 0;
             const limit = Number(req.query.limit) || 30;
             const search = new RegExp(req.params.search, 'i');
-            const clients = await clientModel.paginate({ store: req.query.loja, name: { $regex: search } }, {offset, limit, populate: "User"});
+            const clients = await clientModel.paginate({ store: req.query.loja, name: { $regex: search } }, {offset, limit, populate: "user"});
             return res.send({ clients });
         }catch (e) {
             next(e);
@@ -39,10 +37,12 @@ class ClientController {
     }
 
     async getAdmin(req, res, next) {
+        const client_id = req.params.id
+        console.log(client_id)
         try {
-            const client = await clientModel.findOne({ _id: req.params.id, store: req.query.loja }).populate("user");
+            const client = await clientModel.findOne({ user: client_id, store: req.query.loja }).populate("user");
             if (!client) return res.send({message: "Cliente não encontrado!"});
-            return res.send({ admin: client });
+            return res.send({ client: client });
         }catch (e) {
             next(e)
         }
@@ -54,9 +54,10 @@ class ClientController {
 
     async updateAdmin(req, res, next) {
         try {
-            const { name, CPF, email, phones, address, dateOfBirth } = req.body
-            const client = clientModel.findOne(req.params.id).populate('User');
-            await this.__updateInfoClient(name, client, email, CPF, phones, address, dateOfBirth);
+            const { name, CPF, email, phones, address, dateOfBirth, password } = req.body
+            const client = await clientModel.findOne({_id: req.params.id}).populate({path: "user"});
+            if (!client) return res.send({error: "Cliente não Cadastrado!"})
+            await ClientController.__updateInfoClient(client, name, email, CPF, phones, address, dateOfBirth, password);
             return res.send({client, message: 'Admin Atualizado!'});
         } catch (e) {
             next(e);
@@ -79,7 +80,7 @@ class ClientController {
 
     async createInStore(req, res, next) {
         try {
-            if (!await ClientController.hasStore(req.query.loja)) return res.send({message: 'Id da Loja Inválido'})
+            if (!await ClientController.__hasStore(req.query.loja)) return res.send({message: 'Id da Loja Inválido'})
                 .status('401')
             const { name, email, CPF, phones, address, dateOfBirth, password } = req.body;
             const new_user = new userModel({ name, email, password, store: req.query.loja });
@@ -97,11 +98,9 @@ class ClientController {
     async updateClient(req, res, next) {
         try {
             const { name, email, CPF, phones, address, dateOfBirth, password } = req.body;
-            const client = await clientModel.findById(req.payload.id).populate({path: 'User', select: '+password'});
-
-            if (password) client.user.password  = password;
-            await this.__updateInfoClient(name, client, email, CPF, phones, address, dateOfBirth);
-            client.user.password = undefined;
+            const client = await clientModel.findOne({user: req.payload._id}).populate({path: "user"});
+            if (!client) return res.send({error: 'Cliente não encontrado!'});
+            await ClientController.__updateInfoClient(client, name, email, CPF, phones, address, dateOfBirth, password);
             return res.send({client, message: "Cliente Atualizado com Sucesso!"});
         }catch (e) {
             next(e);
@@ -110,10 +109,11 @@ class ClientController {
 
     async removeClient(req, res, next) {
         try {
-            const client = await clientModel.findById({ user: req.payload.id }).populate({path: 'user', select: '+password'});
+            const client = await clientModel.findOne({ user: req.payload._id })
+                .populate({path: "user"});
+            if (!client) return res.send({error: 'Cliente não encontrado'}).status('404');
             await client.user.remove();
             client.deleted = true;
-            await client.user.save();
             await client.save();
             return res.send({message: 'Cliente excluido com sucesso!'})
         }catch (e) {
@@ -121,7 +121,7 @@ class ClientController {
         }
     }
 
-    async __updateInfoClient(name, client, email, CPF, phones, address, dateOfBirth) {
+    static async __updateInfoClient(client, name, email, CPF, phones, address, dateOfBirth, password) {
         if (name) {
             client.user.name = name;
             client.name = name;
@@ -131,12 +131,13 @@ class ClientController {
         if (phones) client.phones = phones;
         if (address) client.address = address;
         if (dateOfBirth) client.dateOfBirth = dateOfBirth;
+        if (password) client.user.password = password
 
         await client.user.save();
         await client.save();
     }
 
-    static async hasStore(store_id) {
+    static async __hasStore(store_id) {
         try {
             return await storeModel.findById(store_id);
         }catch (e) {

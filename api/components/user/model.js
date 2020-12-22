@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
-import { genSaltSync, hashSync } from 'bcrypt';
+import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 import { randomBytes } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { secret } from '../../config/config'
@@ -50,12 +50,12 @@ const userSchema = new Schema ({
 
 userSchema.plugin(uniqueValidator, {message: 'is already being used'});
 
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function(next){
+    if (!this.password) next();
     const salt = await genSaltSync(10);
     this.password = await hashSync(this.password, salt);
     next();
 });
-
 
 userSchema.methods.generateUserToken = function() {
     return jwt.sign({

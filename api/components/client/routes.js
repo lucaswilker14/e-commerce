@@ -26,7 +26,7 @@ router.get('/', auth.required, isAdmin, validator.query(index), clientController
 router.get('/search/:search', auth.required, isAdmin, validator.query(searchClient.query),
     validator.params(searchClient.params), clientController.searchClient); // ok
 
-router.get('/admin/:id', auth.required, isAdmin, validator.params(getAdmin), clientController.getAdmin);
+router.get('/admin/:id', auth.required, isAdmin, validator.params(getAdmin), clientController.getAdmin); //ok
 
 router.put('/admin/:id', auth.required, isAdmin, validator.params(updateAdmin.params),
     validator.body(updateAdmin.body), clientController.updateAdmin);
@@ -36,7 +36,7 @@ router.put('/admin/:id', auth.required, isAdmin, validator.params(updateAdmin.pa
 router.get('/:id', auth.required, validator.query(getClient), clientController.getClient); // ok
 
 router.post('/', validator.query(createInStore.query),
-    validator.body(createInStore.body), clientController.createInStore);
+    validator.body(createInStore.body), clientController.createInStore); //ok
 
 router.put('/:id', auth.required, validator.query(updateClient.query),
     validator.params(updateClient.params), validator.body(updateClient.body), clientController.updateClient);

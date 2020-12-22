@@ -2,6 +2,7 @@ import Joi from 'joi';
 
 const required_only     = Joi.string().required();
 const required_id       = Joi.string().id().length(24).required();
+const optional_id       = Joi.string().id().length(24).optional();
 const required_optional = Joi.string().optional();
 const required_number   = Joi.number().optional();
 
@@ -87,11 +88,11 @@ const createInStore = {
 };
 
 const updateClient = {
-    query:  Joi.object({ store: required_id }),
+    query:  Joi.object({ loja: required_id }),
     params: Joi.object({ id: required_id }),
     body:   Joi.object({
-          id:           required_id
-        , store:        required_id
+          id:           optional_id
+        , store:        optional_id
         , name:         required_optional
         , CPF:          required_optional
         , email:        required_optional.email()

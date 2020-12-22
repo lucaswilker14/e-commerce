@@ -16,7 +16,8 @@ const isAdmin = (req, res, next) => {
         .then(user => {
             if (!user) return res.sendStatus('401');
             if (!user.store) return res.send({message: 'Loja não cadastrada'}).status('401');
-            if (!user.role.includes('admin')) return res.sendStatus('401');
+            if (!user.role.includes('admin')) return res.send({error: 'Permissão somente para Admins'})
+                .status('401');
             if (user.store.toString() !== req.query.loja) return res.send({message: 'Loja não cadastrada'})
                                                                     .status('401');
             next();
