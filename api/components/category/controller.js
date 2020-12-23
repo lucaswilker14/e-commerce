@@ -29,7 +29,11 @@ class CategoryController {
 
     async getCategoryByID(req, res, next) {
         try {
-
+            const category = await categoryModel.findOne({ store: req.query.loja, _id: req.params.id })
+                .select('_id products name code store')
+                .populate(['products']);
+            if (!category) return res.send({error: 'Nenhuma categoria encontrada'}).status('404');
+            return res.send({ category: category }).status('404');
         } catch (e) {
             next(e)
         }
