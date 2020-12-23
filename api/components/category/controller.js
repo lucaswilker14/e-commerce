@@ -6,16 +6,22 @@ class CategoryController {
 
     async index(req, res, next) {
         try {
-            const category = await categoryModel.find({ store: req.query.loja }).select('_id product name code store');
-            return res.send({categories: category}).status('200');
+            const all_categories_by_store = await categoryModel.find({ store: req.query.loja })
+                .select('_id products name code store');
+            if (!all_categories_by_store) return res.send({error: 'Não possui categorias para essa loja!'})
+                .status('404');
+            return res.send({categories: all_categories_by_store}).status('200');
         } catch (e) {
             next(e)
         }
     };
 
-    async getAvailability(req, res, next) {
+    async getAvailable(req, res, next) {
         try {
-
+            const categories = await categoryModel.find({ store: req.query.loja, available: true})
+                .select('_id products name code store');
+            if (!categories) return res.send({error: 'Não possui categorias disponíveis!'}).status('404');
+            return res.send({available: categories}).status('200');
         } catch (e) {
             next(e)
         }
