@@ -53,6 +53,7 @@ app.use(body_parser.urlencoded({extends: true, limit: 1.5*1024*1024}));
 require("../e-commerce/api/components/user/model");
 require("../e-commerce/api/components/store/model")
 require("../e-commerce/api/components/client/model")
+require("../e-commerce/api/components/category/model")
 
 
 // loading routes
