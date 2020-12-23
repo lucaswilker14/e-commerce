@@ -19,7 +19,6 @@ const PORT = process.env.PORT || 3000;
 
 
 //  static files
-
 app.use(express.static(path.join(__dirname, '/api/public')));
 app.use("/api/public/images", express.static(__dirname + "../api/public/images"));
 
@@ -32,7 +31,6 @@ mongoose.connect(dbURI, {useNewUrlParser: true, useCreateIndex: true,
 
 // Set 'views' directory for any views
 // being rendered res.render()
-// app.set('views', path.join(__dirname, '/api/components/user/views'));
 app.set('views', path.join(__dirname, '/api/components/user/views'));
 
 // Set view engine as EJS
@@ -54,6 +52,7 @@ app.use(body_parser.urlencoded({extends: true, limit: 1.5*1024*1024}));
 // models
 require("../e-commerce/api/components/user/model");
 require("../e-commerce/api/components/store/model")
+require("../e-commerce/api/components/client/model")
 
 
 // loading routes

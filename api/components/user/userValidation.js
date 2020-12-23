@@ -10,21 +10,21 @@ const getByIdValidator = Joi.object({
 });
 
 const registerUserValidator = Joi.object({
-    name: required_only
+      name: required_only
     , email: required_email
     , password: required_only
     , store: required_id
 });
 
 const loginValidator = Joi.object({
-    email: required_email,
-    password: required_only
+      email: required_email
+    , password: required_only
 });
 
 const updateUserValidator = Joi.object({
-    name: required_optional,
-    email: Joi.string().email().optional(),
-    password: required_optional
+      name: required_optional
+    , email: Joi.string().email().optional()
+    , password: required_optional
 });
 
 

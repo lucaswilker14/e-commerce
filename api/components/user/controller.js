@@ -1,51 +1,70 @@
-import { model } from 'mongoose';
+import {model} from 'mongoose';
 import sendEmailRecovery from '../../helpers/email-recovery';
-import { compare } from 'bcrypt'
+import {compare} from 'bcrypt'
 
 const recovery_view = '../views/recovery.ejs';
 const recovery_store_view = '../views/store.ejs';
 
 const userModel = model('User');
+const storeModel = model('Store');
+
 
 class UserController {
 
     async signup(req, res, next) {
-        const { name, email, password, store } = req.body;
-        const new_user = new userModel({ name, email, password, store });
-        await new_user.save()
-            .then(() => res.json({user: new_user.getModelUser(), message: "Cadastro Realizado com Sucesso!"}))
-            .catch(next);
-    };
+        try {
+            const { name, email, password, store } = req.body;
+            const new_user = new userModel({ name, email, password, store });
+            // if (!await UserController.hasStore(store)) return res.json({message: "Loja não cadastrada!"});
+            await new_user.save()
+                .then(() => res.json({user: new_user.getModelUser(), message: "Cadastro Realizado com Sucesso!"}))
+                .catch(next);
+        }catch (e) {
+            next(e)
+        }
+    }
 
     async login(req, res, next) {
-        const { email, password } = req.body;
-        await userModel.findOne({ email }).select('+password').then(async user =>  {
-            if (!user) return res.send({error: 'Usuário não encontrado!'}).status(404);
-            if (!await compare(password, user.password)) return res.send({error: "Senha Inválida"}).status(400);
-            const token = user.generateUserToken()
-            return res.send({user: user.getModelUser(), token});
-        });
+        try {
+            const { email, password } = req.body;
+            await userModel.findOne({ email }).select('+password').then(async user =>  {
+                if (!user) return res.send({error: 'Usuário não encontrado!'}).status(404);
+                if (!await compare(password, user.password)) return res.send({error: "Senha Inválida"}).status(400);
+                const token = user.generateUserToken()
+                return res.send({user: user.getModelUser(), token});
+            });
+        }catch (e) {
+            next(e);
+        }
     };
 
     async update(req, res, next) {
-        const { name, email, password } = req.body;
-        await userModel.findById(req.payload._id).select('+password').then(user => {
-            if (!user) return res.status(401).json({errors: 'Usuário não cadastrado!'});
-            if (typeof name !== 'undefined') user.name = name;
-            if (typeof email !== 'undefined') user.email = email;
-            if (typeof password !== 'undefined') user.password = password;
-            return user.save().then(() => {
-                return res.json({user: user.getModelUser(), message: 'Cadastro Atualizado'});
+        try {
+            const { name, email, password } = req.body;
+            await userModel.findById(req.payload._id).select('+password').then(user => {
+                if (!user) return res.status(401).json({errors: 'Usuário não cadastrado!'});
+                if (typeof name !== 'undefined') user.name = name;
+                if (typeof email !== 'undefined') user.email = email;
+                if (typeof password !== 'undefined') user.password = password;
+                return user.save().then(() => {
+                    return res.json({user: user.getModelUser(), message: 'Cadastro Atualizado'});
+                }).catch(next);
             }).catch(next);
-        }).catch(next);
+        }catch (e) {
+            next(e);
+        }
     };
 
     async removeUserAccount(req, res, next) {
-        const id = req.payload._id;
-        await userModel.findByIdAndRemove(id).then(user => {
-            if(!user) return res.status(404).json({error: "Usuário não cadastrado"})
-            res.json({message: 'Sua conta foi excluida!'});
-        }).catch(next);
+        try {
+            const id = req.payload._id;
+            await userModel.findByIdAndRemove(id).then(user => {
+                if(!user) return res.status(404).json({error: "Usuário não cadastrado"})
+                res.json({message: 'Sua conta foi excluida!'});
+            }).catch(next);
+        }catch (e) {
+            next(e);
+        }
     };
 
     showRecovery(req, res, next) {
@@ -78,15 +97,15 @@ class UserController {
     async finishRecovery(req, res, next) {
         const { token, password } = req.body;
         if(!token || !password) return res.render(recovery_store_view, {   error: "Preencha novamente com sua nova senha",
-                                                                        success: null, token: token });
+            success: null, token: token });
         await userModel.findOne({ "recovery.token": token }).select('+password').then(async (user) => {
             if(!user) return res.render(recovery_view, {error: "Usuário não identificado", success: null});
             user.resetToken();
             user.password = password;
             return user.save().then(() => {
                 return res.render(recovery_store_view, {   error: null,
-                                                        success: "Senha alterada com Sucesso",
-                                                        token: null });
+                    success: "Senha alterada com Sucesso",
+                    token: null });
             }).catch(next);
         }).catch(next);
     }
@@ -97,16 +116,28 @@ class UserController {
                 if(!user) return res.status(401).json({error: "Usuário não cadastrado!"});
                 return res.json({user: user.getModelUser()});
             }).catch(next);
-        }catch (next) {
-            return null;
+        }catch (e) {
+            next(e);
         }
     };
 
     async getUserById(req, res, next) {
-        await userModel.findById(req.params.id).then(user => {
-            if(!user) return res.status(401).json({error: "Usuário não cadastrado!"});
-            return res.json({ user: user.getModelUser()});
-        }).catch(next);
+        try {
+            await userModel.findById(req.params.id).then(user => {
+                if(!user) return res.status(401).json({error: "Usuário não cadastrado!"});
+                return res.json({ user: user.getModelUser()});
+            }).catch(next);
+        }catch (e) {
+            next(e);
+        }
+    };
+
+    static async hasStore(store_id) {
+        try {
+            return await storeModel.findById(store_id);
+        }catch (e) {
+            console.log(e);
+        }
     };
 
 }

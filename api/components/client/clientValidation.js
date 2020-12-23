@@ -1,0 +1,124 @@
+import Joi from 'joi';
+
+const required_only     = Joi.string().required();
+const required_id       = Joi.string().id().length(24).required();
+const optional_id       = Joi.string().id().length(24).optional();
+const required_optional = Joi.string().optional();
+const required_number   = Joi.number().optional();
+
+
+// admin
+const index = Joi.object({
+    offset: required_number,
+    limit:  required_number,
+    loja:   required_optional
+});
+
+const searchOrders = Joi.object({
+
+});
+
+const searchClient = {
+    query:  Joi.object({
+        offset: required_number,
+        limit:  required_number,
+        loja:   required_optional
+
+    }),
+    params: Joi.object({
+        search: required_only
+    })
+};
+
+const getAdmin = Joi.object({
+    id: required_id
+});
+
+const getAllOrderClients = Joi.object({
+
+});
+
+const updateAdmin = {
+    params: Joi.object({
+         id:        required_id
+    }),
+    body: Joi.object({
+          name:     required_optional
+        , CPF:      required_optional
+        , email:    required_optional.email()
+        , phones:   Joi.array().items(required_only).optional()
+        , address:  Joi.object({
+            street:         required_only
+            , number:       required_only
+            , complement:   required_only
+            , neighborhood: required_only
+            , city:         required_only
+            , CEP:          required_only
+        }).optional()
+        , dateOfBirth: Joi.date().optional()
+    })
+};
+
+
+// client
+const getClient = Joi.object({
+    loja:  required_id
+});
+
+const createInStore = {
+    query: Joi.object({
+        loja: required_id
+    }),
+    body: Joi.object({
+          name:     required_only
+        , email:    required_only.email()
+        , CPF:      required_only
+        , phones:   Joi.array().items(required_only).required()
+        , address:  Joi.object({
+            street:         required_only
+            , number:       required_only
+            , complement:   required_only
+            , neighborhood: required_only
+            , city:         required_only
+            , CEP:          required_only
+        }).required()
+        , dateOfBirth:      Joi.date().required()
+        , password:         required_only
+    })
+};
+
+const updateClient = {
+    query:  Joi.object({ loja: required_id }),
+    params: Joi.object({ id: required_id }),
+    body:   Joi.object({
+          id:           optional_id
+        , store:        optional_id
+        , name:         required_optional
+        , CPF:          required_optional
+        , email:        required_optional.email()
+        , phones:       Joi.array().items(required_only).optional()
+        , address:      Joi.object({
+            street:         required_only
+            , number:       required_only
+            , complement:   required_only
+            , neighborhood: required_only
+            , city:         required_only
+            , CEP:          required_only
+        }).optional()
+        , dateOfBirth:  Joi.date().optional()
+        , password:     required_optional
+    })
+};
+
+
+module.exports = {
+    index
+    , searchOrders
+    , searchClient
+    , getAdmin
+    , getAllOrderClients
+    , updateAdmin
+    , getClient
+    , createInStore
+    , updateClient
+}
