@@ -1,4 +1,4 @@
-import { } from 'express'
+import { Router } from 'express'
 import CategoryController from './controller';
 import { isAdmin } from '../store/storeValidation'
 import { createValidator } from "express-joi-validation";
@@ -9,7 +9,7 @@ const categoryController  = new CategoryController();
 const validator         = createValidator({passError: true});
 
 router.get('/', categoryController.index);
-router.get('/disponiveis', categoryController.getAvailability);
+router.get('/disponiveis', categoryController.getAvailable);
 router.get('/:id', categoryController.getCategoryByID);
 
 router.post('/', auth.required, isAdmin, categoryController.createCategory);
