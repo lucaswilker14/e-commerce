@@ -4,9 +4,9 @@ import { isAdmin } from '../store/storeValidation'
 import { createValidator } from "express-joi-validation";
 import auth from '../../auth/auth';
 
-const router            = Router();
-const categoryController  = new CategoryController();
-const validator         = createValidator({passError: true});
+const router                = Router();
+const categoryController    = new CategoryController();
+const validator             = createValidator({passError: true});
 
 router.get('/', categoryController.index);
 router.get('/disponiveis', categoryController.getAvailable);
