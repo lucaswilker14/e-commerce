@@ -54,6 +54,7 @@ require("../e-commerce/api/components/user/model");
 require("../e-commerce/api/components/store/model")
 require("../e-commerce/api/components/client/model")
 require("../e-commerce/api/components/category/model")
+require("../e-commerce/api/components/products/model")
 
 
 // loading routes
