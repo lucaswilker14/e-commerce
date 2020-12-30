@@ -6,7 +6,6 @@ const storeModel    = model('Store');
 
 class ClientController {
 
-
     // admin methods
     async index(req, res, next) {
         try {
