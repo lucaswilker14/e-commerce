@@ -38,6 +38,40 @@ class ProductController {
         }
     };
 
+    
+    //client/visitors routes
+    async index(req, res, next) {
+        try {
+
+        } catch (e) {
+            next(e)
+        }
+    };
+
+    async getAvailables(req, res, next) {
+        try {
+
+        } catch (e) {
+            next(e)
+        }
+    };
+
+    async getSearch(req, res, next) {
+        try {
+
+        } catch (e) {
+            next(e)
+        }
+    };
+
+    async getAvailableByID(req, res, next) {
+        try {
+
+        } catch (e) {
+            next(e)
+        }
+    };
+
 }
 
 module.exports = ProductController;
