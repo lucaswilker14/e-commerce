@@ -12,11 +12,11 @@ const validator         = createValidator({passError: true});
 
 
 //admin
-router.post('/', auth.required, isAdmin, ProductController.newProduct);
-router.put('/:id', auth.required, isAdmin, ProductController.update);
+router.post('/', auth.required, isAdmin, productController.newProduct);
+router.put('/:id', auth.required, isAdmin, productController.update);
 router.put('/images/:id', auth.required, isAdmin, upload.array('files', 4),
-    ProductController.uploadImages)
-router.delete('/:id', auth.required, isAdmin, ProductController.remove);
+    productController.uploadImages)
+router.delete('/:id', auth.required, isAdmin, productController.remove);
 
 
 //client/visitors
@@ -31,4 +31,4 @@ router.get('/:id', productController.getAvailableByID);
 //ratings
 
 
-module.exports = router
+module.exports = router;
