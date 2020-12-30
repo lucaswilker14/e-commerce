@@ -10,6 +10,7 @@ const router            = Router();
 const productController = new ProductController();
 const validator         = createValidator({passError: true});
 
+
 //admin
 router.post('/', auth.required, isAdmin, ProductController.newProduct);
 router.put('/:id', auth.required, isAdmin, ProductController.update);
@@ -19,6 +20,11 @@ router.delete('/:id', auth.required, isAdmin, ProductController.remove);
 
 
 //client/visitors
+router.get('/', productController.index);
+router.get('/disponiveis', productController.getAvailables);
+router.get('/search/:search', productController.getSearch);
+router.get('/:id', productController.getAvailableByID);
+
 
 //variations
 
