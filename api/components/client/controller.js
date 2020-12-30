@@ -6,7 +6,6 @@ const storeModel    = model('Store');
 
 class ClientController {
 
-
     // admin methods
     async index(req, res, next) {
         try {
@@ -38,7 +37,6 @@ class ClientController {
 
     async getAdmin(req, res, next) {
         const client_id = req.params.id
-        console.log(client_id)
         try {
             const client = await clientModel.findOne({ user: client_id, store: req.query.loja }).populate("user");
             if (!client) return res.send({message: "Cliente não encontrado!"});
