@@ -20,7 +20,7 @@ class CategoryController {
         try {
             const categories = await categoryModel.find({ store: req.query.loja, available: true})
                 .select('_id products name code store');
-            if (!categories) return res.send({error: 'Não possui categorias disponíveis!'}).status('404');
+            if (categories.length === 0 || !categories) return res.send({error: 'Não possui categorias disponíveis!'}).status('404');
             return res.send({available: categories}).status('200');
         } catch (e) {
             next(e)
@@ -42,8 +42,8 @@ class CategoryController {
     async createCategory(req, res, next) {
         try {
             const { name, code }    = req.body;
-            const { store }         = req.query;
-            const category          = new categoryModel({ name, code, store, available:true });
+            const { loja }         = req.query;
+            const category          = new categoryModel({ name, code, store:loja , available:true });
             await category.save();
             return res.send({ message: 'Nova Categoria Criada', new_category: category }).status('201')
         } catch (e) {
@@ -70,6 +70,7 @@ class CategoryController {
     async remove(req, res, next) {
         try {
             const category = await categoryModel.findById(req.params.id);
+            if (!category) return res.send({message: 'Produto não encontrado!'})
             await category.remove();
             return res.send({message: 'Categoria Excluída com Sucesso!', delete: true, available: false});
         } catch (e) {
