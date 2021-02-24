@@ -1,5 +1,5 @@
 import expressjwt from 'express-jwt';
-import { secret } from '../config/config'
+import { secret } from '../config/config';
 
 const getToken = (req, res, next) => {
     if(!req.headers.authorization) return null;

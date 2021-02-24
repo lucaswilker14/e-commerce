@@ -6,7 +6,7 @@ import ejs from 'ejs';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import cors from 'cors';
-import path from 'path'
+import path from 'path';
 
 
 // start application
@@ -53,18 +53,18 @@ app.use(body_parser.urlencoded({extends: true, limit: 1.5*1024*1024}));
 
 // models
 require("../e-commerce/api/components/user/model");
-require("../e-commerce/api/components/store/model")
+require("../e-commerce/api/components/store/model");
 
 
 // loading routes
 const routes = require('../e-commerce/api/routes');
-app.use("/", routes)
+app.use("/", routes);
 
 
 // 404 - route
 app.use((req, res, next) => {
     const err = new Error("Not Found");
-    err.status = 404
+    err.status = 404;
     next(err);
 });
 
